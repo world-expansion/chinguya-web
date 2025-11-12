@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/auth/(.*)",
+      "destination": "http://YOUR_EC2_HOST:PORT/api/auth/$1"
+    },
+    {
+      "source": "/api/chat/(.*)",
+      "destination": "http://YOUR_EC2_HOST:PORT/api/chat/$1"
+    },
+
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
+  ]
+}

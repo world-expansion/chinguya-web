@@ -13,10 +13,12 @@ export async function http(method, url, { body, headers } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined,
   });
+
   const ctype = res.headers.get("content-type") || "";
   const data = ctype.includes("application/json")
     ? await res.json()
     : await res.text();
+
   if (!res.ok) {
     const msg =
       typeof data === "string" ? data : data?.message || "Request failed";
@@ -27,5 +29,6 @@ export async function http(method, url, { body, headers } = {}) {
   }
   return data;
 }
+
 export const get = (u, o) => http("GET", u, o);
 export const post = (u, b, o = {}) => http("POST", u, { ...o, body: b });
