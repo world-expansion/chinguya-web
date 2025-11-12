@@ -33,7 +33,7 @@ export const DiaryListPage = () => {
 
       <main className="p-4 space-y-3">
         <div className="flex items-center gap-2">
-          <label className="text-sm">최근 일수</label>
+          <label className="text-sm">조회 기간(일)</label>
           <input
             type="number"
             min={1}

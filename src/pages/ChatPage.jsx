@@ -69,7 +69,7 @@ export const ChatPage = () => {
     }
   };
 
-  // 세션 종료 → 서버가 일기를 생성함 → 오늘 날짜 상세로 이동
+  // 세션 종료 → 서버가 일기를 생성 → 오늘 날짜 상세로 이동
   const makeDiary = async () => {
     if (!sessionId || loading) return;
     setLoading(true);
@@ -99,17 +99,8 @@ export const ChatPage = () => {
         <h1 className="text-lg font-medium">챗봇 대화</h1>
       </header>
 
+      {/* 본문 */}
       <main className="flex-1 p-4 space-y-3 overflow-auto">
-        <div className="flex gap-2">
-          <button
-            className="border rounded px-3 py-2"
-            onClick={makeDiary}
-            disabled={loading || !sessionId}
-          >
-            감정일기 생성
-          </button>
-        </div>
-
         {messages.map((m, i) => (
           <div
             key={i}
@@ -123,6 +114,7 @@ export const ChatPage = () => {
         {loading && <p className="text-sm">요청 처리 중…</p>}
       </main>
 
+      {/* 하단 입력바: 전송 + 감정일기 생성 버튼 나란히 */}
       <div className="p-3 border-t fixed bottom-12 left-0 right-0 bg-white">
         <div className="flex gap-2">
           <input
@@ -136,8 +128,18 @@ export const ChatPage = () => {
             className="border rounded px-4"
             onClick={send}
             disabled={loading}
+            aria-label="메시지 전송"
           >
             전송
+          </button>
+          <button
+            className="border rounded p-2 bg-white fixed bottom-32 right-4"
+            onClick={makeDiary}
+            disabled={loading || !sessionId}
+            aria-label="감정일기 생성"
+            title="현재 대화를 바탕으로 감정일기 생성"
+          >
+            일기 생성
           </button>
         </div>
       </div>
