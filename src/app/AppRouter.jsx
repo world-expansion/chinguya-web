@@ -1,6 +1,6 @@
-// src/app/Router.jsx
+// src/app/AppRouter.jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { RequireAuth, PublicOnly } from "./Guard";
+import { RequireAuth, PublicOnly, RequireCheckupDone } from "./Guard";
 import { lazy } from "react";
 import Layout from "./Layout";
 
@@ -21,6 +21,12 @@ const DiaryDetailPage = lazy(() =>
     default: m.DiaryDetailPage,
   }))
 );
+const PHQ9Page = lazy(() =>
+  import("../pages/PHQ9Page").then((m) => ({ default: m.PHQ9Page }))
+);
+const MorePage = lazy(() =>
+  import("../pages/MorePage").then((m) => ({ default: m.MorePage }))
+);
 
 const router = createBrowserRouter([
   // 공개 라우트
@@ -32,17 +38,27 @@ const router = createBrowserRouter([
     ],
   },
 
-  // 보호 라우트 + 루트 레이아웃(Outlet+TabBar)
+  // 보호 라우트
   {
     element: <RequireAuth />,
     children: [
+      // ⛔ Layout 밖: PHQ-9 (TabBar 미노출)
+      { path: "/checkup", element: <PHQ9Page /> },
+
+      // ✅ Layout 안: TabBar 노출 + 점검 완료 필요
       {
-        element: <Layout />, // ⬅ 여기서 TabBar를 포함
+        element: <Layout />,
         children: [
-          { path: "/", element: <ChatPage /> },
-          { path: "/chat", element: <ChatPage /> },
-          { path: "/diary", element: <DiaryListPage /> },
-          { path: "/diary/:id", element: <DiaryDetailPage /> },
+          {
+            element: <RequireCheckupDone />,
+            children: [
+              { path: "/", element: <ChatPage /> },
+              { path: "/chat", element: <ChatPage /> },
+              { path: "/diary", element: <DiaryListPage /> },
+              { path: "/diary/date/:id", element: <DiaryDetailPage /> },
+              { path: "/more", element: <MorePage /> },
+            ],
+          },
         ],
       },
     ],

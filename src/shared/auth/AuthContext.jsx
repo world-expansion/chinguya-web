@@ -15,8 +15,8 @@ export function AuthProvider({ children }) {
       try {
         const hasToken = !!tokenStore.get();
         if (hasToken) {
-          const fresh = await authService.me(); // 실패하면 기존 LS 유지
-          if (fresh) setUser(fresh);
+          const me = await authService.me(); // 실패하면 기존 LS 유지
+          if (me) setUser(me);
         }
       } catch {
         // 토큰이 유효하지 않으면 정리
@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const { user: me } = await authService.login({ email, password });
     setUser(me || { email });
+    return me;
   };
 
   const register = async (email, password, nickname) => {

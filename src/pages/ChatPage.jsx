@@ -1,9 +1,8 @@
 // src/pages/ChatPage.jsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LS } from "../shared/lib/storage";
 import { chatService } from "../entities/chat/model";
-import { diaryStore } from "../entities/diary/model";
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState(() =>
@@ -19,19 +18,9 @@ export const ChatPage = () => {
   const [sessionId, setSessionId] = useState(null);
   const nav = useNavigate();
 
-  // 자동 스크롤 앵커
-  const bottomRef = useRef(null);
-  const scrollToBottom = (smooth = true) => {
-    bottomRef.current?.scrollIntoView({
-      behavior: smooth ? "smooth" : "auto",
-      block: "end",
-    });
-  };
-
-  // 대화 로그 로컬 보관 + 새 메시지마다 스크롤
+  // 대화 로그 로컬 보관
   useEffect(() => {
     LS.set("chatMessages", messages);
-    scrollToBottom(messages.length <= 2 ? false : true);
   }, [messages]);
 
   // 최초 진입 시 세션 생성
@@ -62,7 +51,6 @@ export const ChatPage = () => {
     setLoading(true);
 
     try {
-      // 세션 없으면 즉시 생성
       const sid = sessionId ?? (await chatService.createSession());
       if (!sessionId) setSessionId(sid);
 
@@ -81,38 +69,18 @@ export const ChatPage = () => {
     }
   };
 
-  // /session/end → 서버 생성 일기를 로컬 캐시에 업서트 후 상세로 이동
+  // 세션 종료 → 서버가 일기를 생성함 → 오늘 날짜 상세로 이동
   const makeDiary = async () => {
     if (!sessionId || loading) return;
     setLoading(true);
     try {
-      const { diary } = await chatService.end(sessionId);
-      if (!diary) return;
+      await chatService.end(sessionId);
 
-      // 앱 스키마로 보강(제목/요약/날짜)
-      const now = new Date();
-      const dateISO = now.toISOString();
-      const dateLabel = new Intl.DateTimeFormat("ko-KR", {
-        month: "numeric",
-        day: "numeric",
-      }).format(now);
+      // 서버가 오늘 일기를 생성하므로 YYYY-MM-DD로 라우팅
+      const today = new Date().toISOString().slice(0, 10);
+      nav(`/diary/date/${today}`, { replace: true });
 
-      const normalized = {
-        id: diary.id,
-        dateISO,
-        title: `AI가 정리한 ${dateLabel} 일기`,
-        content: diary.content || "내용이 없습니다.",
-        reframed: diary.reframed || "",
-        summary:
-          (diary.content || "").length > 60
-            ? diary.content.slice(0, 60) + "…"
-            : diary.content || "",
-      };
-
-      const saved = diaryStore.add(normalized);
-      nav(`/diary/${saved.id}`);
-
-      // 새 대화를 위해 세션 재생성(선택)
+      // 새 대화를 위해 세션 재생성
       const sid = await chatService.createSession();
       setSessionId(sid);
     } catch {
@@ -153,8 +121,6 @@ export const ChatPage = () => {
           </div>
         ))}
         {loading && <p className="text-sm">요청 처리 중…</p>}
-        {/* 스크롤 앵커 */}
-        <div ref={bottomRef} />
       </main>
 
       <div className="p-3 border-t fixed bottom-12 left-0 right-0 bg-white">

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../shared/auth/AuthContext";
+import { checkupStore } from "../shared/lib/checkup";
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -18,8 +19,14 @@ export const LoginPage = () => {
     setPending(true);
     setErr("");
     try {
-      await login(email, pw);
-      nav(loc.state?.from?.pathname || "/chat", { replace: true });
+      const me = await login(email, pw);
+      const need = checkupStore.needsCheckup(me.id, 14);
+
+      if (need) {
+        nav("/checkup", { replace: true });
+      } else {
+        nav(loc.state?.from?.pathname || "/chat", { replace: true });
+      }
     } catch (e) {
       setErr(e.message || "로그인 실패");
     } finally {

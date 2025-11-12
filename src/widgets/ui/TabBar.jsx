@@ -9,20 +9,14 @@ export const TabBar = () => {
     <nav className="fixed bottom-0 left-0 right-0 border-t bg-white">
       <div className="grid grid-cols-3 h-12 px-2 pb-[env(safe-area-inset-bottom)]">
         <NavLink to="/chat" className={(p) => `${item} ${active(p)}`}>
-          chat
+          대화
         </NavLink>
         <NavLink to="/diary" className={(p) => `${item} ${active(p)}`}>
-          diary
+          감정일기
         </NavLink>
-        <a
-          href="https://docs.google.com/forms/d/xxxxxxxxxxxx/viewform"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={item}
-          aria-label="서비스 피드백 (새 창)"
-        >
-          서비스 피드백
-        </a>
+        <NavLink to="/more" className={(p) => `${item} ${active(p)}`}>
+          더보기
+        </NavLink>
       </div>
     </nav>
   );
