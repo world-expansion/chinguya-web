@@ -2,10 +2,7 @@
 import { useAuth } from "../shared/auth/AuthContext";
 
 // ✅ 현재 버전 변경사항 (배열 형태)
-const CURRENT_VERSION_NOTES = [
-  "자가 점검 추가",
-  "주간 일기 조회(최근 N일) 및 날짜별 상세 추가",
-];
+const CURRENT_VERSION_NOTES = ["QR 추가", "로그인/회원가입 힌트 추가"];
 
 export const MorePage = () => {
   const { user, logout } = useAuth();
